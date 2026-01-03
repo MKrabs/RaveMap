@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useInfiniteList } from '../providers/InfiniteListProvider';
 import { List, ListItem, ListItemButton, ListItemContent, ListItemDecorator } from '@mui/joy';

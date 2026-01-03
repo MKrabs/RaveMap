@@ -20,7 +20,7 @@ const InfiniteListContext = createContext<InfiniteListContextType>({
 export const InfiniteListProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
   const [items, setItems] = useState<any[]>([]);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(1);
+  const [limit] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -37,7 +37,7 @@ export const InfiniteListProvider: React.FC<React.PropsWithChildren<{}>> = ({ ch
     } finally {
       setLoading(false);
     }
-  }, [page, loading, hasMore]);
+  }, [loading, hasMore, page, limit]);
 
   const resetList = () => {
     setItems([]);

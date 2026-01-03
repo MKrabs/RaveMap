@@ -2,7 +2,7 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import { useInfiniteList } from '../providers/InfiniteListProvider';
 
 const RaveMap = () => {
-    const { items, loadMore, hasMore, loading } = useInfiniteList();
+    const { items } = useInfiniteList();
     return (
         <MapContainer center={[49.0128881,8.4064407]}
                       zoom={13}
