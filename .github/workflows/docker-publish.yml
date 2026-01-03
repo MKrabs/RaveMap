@@ -1,4 +1,4 @@
-name: Build and publish Docker image
+name: Build Rave Map and publish Docker image
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ toLower(github.repository) }}
+  IMAGE_NAME: mkrabs/ravemap
 
 jobs:
   build:
