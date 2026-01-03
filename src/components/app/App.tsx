@@ -1,7 +1,7 @@
 import './App.css'
 import { Box, Grid } from '@mui/joy';
-import RaveList from './RaveList.tsx';
-import RaveMap from './RaveMap.tsx';
+import RaveList from '../RaveList.tsx';
+import RaveMap from '../RaveMap.tsx';
 
 function App() {
     return (
@@ -18,4 +18,4 @@ function App() {
     )
 }
 
-export default App
+export default App;

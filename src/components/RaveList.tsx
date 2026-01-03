@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useInfiniteList } from './InfiniteListProvider';
+import { useInfiniteList } from '../providers/InfiniteListProvider';
 import { List, ListItem, ListItemButton, ListItemContent, ListItemDecorator } from '@mui/joy';
 import Home from '@mui/icons-material/Home';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
@@ -10,8 +10,9 @@ const RaveList = () => {
   const { ref, inView } = useInView();
 
   useEffect(() => {
-    console.log('RaveList inView:', inView);
-    if (inView) loadMore();
+    if (inView) { 
+        loadMore();
+    }
   }, [inView, loadMore]);
 
   return (

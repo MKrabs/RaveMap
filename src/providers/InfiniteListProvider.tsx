@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { fetchItems } from './dataProvider';
+import { fetchItems } from './DataProvider';
 
 interface InfiniteListContextType {
   items: any[];

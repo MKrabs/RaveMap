@@ -1,5 +1,5 @@
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
-import { useInfiniteList } from './InfiniteListProvider';
+import { useInfiniteList } from '../providers/InfiniteListProvider';
 
 const RaveMap = () => {
     const { items, loadMore, hasMore, loading } = useInfiniteList();
