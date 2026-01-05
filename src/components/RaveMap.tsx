@@ -1,10 +1,25 @@
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import { useInfiniteList } from '../providers/InfiniteListProvider';
+import { getUserLocation } from '../helpers/userLocation';
+import { useEffect, useState } from 'react';
 
 const RaveMap = () => {
     const { items } = useInfiniteList();
+    const [ userLocation, setUserLocation ] = useState<GeolocationPosition | null>(null);
+
+    useEffect(() => {
+        console.log("effect ran");
+        getUserLocation().then(location => {
+            setUserLocation(location);
+        }); // TODO maybe add catch block to catch errors later
+    }, []);
+
+    if (!userLocation) {
+        return <div>Loading user location...</div>;
+    }
+
     return (
-        <MapContainer center={[49.0128881,8.4064407]}
+        <MapContainer center={[userLocation.coords.latitude, userLocation.coords.longitude]}
                       zoom={13}
                       scrollWheelZoom={true}
                       style={{ height: '100vh', width: '100wh' }}
