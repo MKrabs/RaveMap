@@ -15,17 +15,20 @@ const RaveList = () => {
     }
   }, [inView, loadMore]);
 
+  const colors = ['#acf6f0ff', '#f9b5b5ff', '#f8eacbff', '#96c1c7ff', '#bdb6ddff'];
+
   return (
-        <List sx={{ width: '100%', height: '100vh', overflowY: 'auto' }}>
+        <List sx={{ width: '100%', height: '100vh', overflowY: 'auto'}}>
             {items.map((event, index) => (
                 <ListItem key={index}>
                     <ListItemButton>
-                        <ListItemDecorator>
-                            <Home />
-                        </ListItemDecorator>
-                        <ListItemContent>
+                        {/* Eigentlich brauchen wir kein Haus-Icon vor jedem Listen-Eintrag @marc, wenn du das gut findest gerne das Snippet löschen (auch den Import dann nicht vergessen) */}
+                        {/* <ListItemDecorator sx={{ color: colors[index % colors.length] }}>
+                            <Home /> 
+                        </ListItemDecorator> */}
+                        <ListItemContent sx={{ color: colors[index % colors.length], '&:hover': { color: '#000' } }}>
+                            <h2>{event.name}</h2>
                             <div>{event.date}</div>
-                            <div>{event.name}</div>
                             <div>{event.description}</div>
                         </ListItemContent>
                         <KeyboardArrowRight />

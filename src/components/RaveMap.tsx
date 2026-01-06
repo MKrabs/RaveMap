@@ -2,6 +2,7 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import { useInfiniteList } from '../providers/InfiniteListProvider';
 import { getUserLocation } from '../helpers/userLocation';
 import { useEffect, useState } from 'react';
+import { icon, Icon } from 'leaflet';
 
 const RaveMap = () => {
     const { items } = useInfiniteList();
@@ -18,6 +19,17 @@ const RaveMap = () => {
         return <div>Loading user location...</div>;
     }
 
+    // TODO hier muss noch ein besseres Icon her
+    const customMarkerIcon = icon({
+        iconUrl: "https://pngimg.com/uploads/cursor/cursor_PNG61.png", 
+        iconSize: [32, 32]
+    });
+
+    const handleMarkerClick = (index: number) => {
+        console.log('Marker clicked:', index);
+        // highlight list item
+    }
+
     return (
         <MapContainer center={[userLocation.coords.latitude, userLocation.coords.longitude]}
                       zoom={13}
@@ -29,7 +41,7 @@ const RaveMap = () => {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             {items.map((marker, index) => (
-                <Marker key={index} position={[marker.latitude, marker.longitude]}>
+                <Marker key={index} position={[marker.latitude, marker.longitude]} icon={customMarkerIcon} eventHandlers={{ click: () => handleMarkerClick(index) }}>
                     <Popup>
                         <span dangerouslySetInnerHTML={{ __html: marker.description }} />
                     </Popup>
