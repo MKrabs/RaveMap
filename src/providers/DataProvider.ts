@@ -1,5 +1,13 @@
-export const fetchItems = async (page: number, limit = 1) => {
-  const response = await fetch(`http://localhost:3000/event/list?page=${page}&limit=${limit}`);
+export type EventItem = {
+  id?: string | number;
+  name?: string;
+  date?: string;
+  description?: string;
+  [key: string]: unknown;
+};
+
+export const fetchItems = async (page: number, limit = 1): Promise<EventItem[]> => {
+  const response = await fetch(`http://localhost:3001/event/list?page=${page}&limit=${limit}`);
   const data = await response.json();
-  return data;
+  return data as EventItem[];
 };

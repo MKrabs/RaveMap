@@ -1,48 +1,84 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { useInfiniteList } from '../providers/InfiniteListProvider';
-import { List, ListItem, ListItemButton, ListItemContent, ListItemDecorator } from '@mui/joy';
-import Home from '@mui/icons-material/Home';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import { useInfiniteList } from '../providers/InfiniteListContext';
+import type { EventItem } from '../providers/DataProvider';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from './ui/sidebar';
 
-const RaveList = () => {
+const RaveList: React.FC = () => {
   const { items, loadMore, hasMore, loading } = useInfiniteList();
   const { ref, inView } = useInView();
+  const [openId, setOpenId] = React.useState<string | number | null>(null);
 
+  // Load initial items on mount
   useEffect(() => {
-    if (inView) { 
-        loadMore();
-    }
+    if (items.length === 0) loadMore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // When sentinel comes into view, load more
+  useEffect(() => {
+    if (inView) loadMore();
   }, [inView, loadMore]);
 
-  const colors = ['#acf6f0ff', '#f9b5b5ff', '#f8eacbff', '#96c1c7ff', '#bdb6ddff'];
+  const toggle = (id: string | number) => setOpenId((p) => (p === id ? null : id));
 
   return (
-        <List sx={{ width: '100%', height: '100vh', overflowY: 'auto'}}>
-            {items.map((event, index) => (
-                <ListItem key={index}>
-                    <ListItemButton>
-                        {/* Eigentlich brauchen wir kein Haus-Icon vor jedem Listen-Eintrag @marc, wenn du das gut findest gerne das Snippet löschen (auch den Import dann nicht vergessen) */}
-                        {/* <ListItemDecorator sx={{ color: colors[index % colors.length] }}>
-                            <Home /> 
-                        </ListItemDecorator> */}
-                        <ListItemContent sx={{ color: colors[index % colors.length], '&:hover': { color: '#000' } }}>
-                            <h2>{event.name}</h2>
-                            <div>{event.date}</div>
-                            <div>{event.description}</div>
-                        </ListItemContent>
-                        <KeyboardArrowRight />
-                    </ListItemButton>
-                </ListItem>
-            ))}
-            <ListItem ref={ref}>
-                <ListItemContent ref={ref}>
-                    {loading && <p>Loading...</p>}
-                    {!hasMore && <p>No more items.</p>}
-                </ListItemContent>
-            </ListItem>
-        </List>
-    );
+    <Sidebar variant="floating">
+      <SidebarHeader>
+        <div className="flex flex-col">
+          <span className="font-semibold">RaveMap</span>
+          <span className="text-xs text-muted-foreground">Live events</span>
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Events</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map((event: EventItem, idx: number) => (
+                <SidebarMenuItem key={`${String(event.id ?? 'event')}-${idx}`}>
+                  <SidebarMenuButton onClick={() => toggle(event.id ?? idx)}>
+                    <div className="flex-1">
+                      <div className="font-medium">{event.name ?? 'Untitled event'}</div>
+                      <div className="text-xs text-muted-foreground">{event.date ?? ''}</div>
+                    </div>
+                    <div>{openId === (event.id ?? idx) ? '-' : '+'}</div>
+                  </SidebarMenuButton>
+
+                  {openId === (event.id ?? idx) && (
+                    <div className="px-3 pb-3 text-sm text-gray-700 dark:text-gray-300">
+                      {event.description ?? 'No description'}
+                    </div>
+                  )}
+                </SidebarMenuItem>
+              ))}
+
+              <li ref={ref} className="text-center">
+                {loading && <div className="text-sm">Loading...</div>}
+                {!hasMore && !loading && items.length > 0 && (
+                  <div className="text-sm text-muted-foreground">No more items</div>
+                )}
+              </li>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarRail />
+    </Sidebar>
+  );
 };
 
 export default RaveList;

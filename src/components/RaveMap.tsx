@@ -1,5 +1,5 @@
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
-import { useInfiniteList } from '../providers/InfiniteListProvider';
+import { useInfiniteList } from '../providers/InfiniteListContext';
 import { getUserLocation } from '../helpers/userLocation';
 import { useEffect, useState } from 'react';
 import { icon, Icon } from 'leaflet';
