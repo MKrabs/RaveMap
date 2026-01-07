@@ -21,7 +21,7 @@ const RaveMap = () => {
 
     // TODO hier muss noch ein besseres Icon her
     const customMarkerIcon = icon({
-        iconUrl: "https://pngimg.com/uploads/cursor/cursor_PNG61.png", 
+        iconUrl: "../../public/arrow.svg", 
         iconSize: [32, 32]
     });
 
@@ -38,7 +38,7 @@ const RaveMap = () => {
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
             />
             {items.map((marker, index) => (
                 <Marker key={index} position={[marker.latitude, marker.longitude]} icon={customMarkerIcon} eventHandlers={{ click: () => handleMarkerClick(index) }}>
