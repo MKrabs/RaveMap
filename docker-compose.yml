@@ -1,0 +1,23 @@
+services:
+  ravemap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ravemap
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - pb_data:/pb/pb_data
+    environment:
+      # Optional: change this if you want a different exposed port inside the container
+      - TZ=UTC
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8090/api/collections/events/records?perPage=1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  pb_data:

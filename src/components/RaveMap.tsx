@@ -2,7 +2,7 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import { useInfiniteList } from '../providers/InfiniteListContext';
 import { getUserLocation } from '../helpers/userLocation';
 import { useEffect, useState } from 'react';
-import { icon, Icon } from 'leaflet';
+import { icon } from 'leaflet';
 
 const RaveMap = () => {
     const { items } = useInfiniteList();
@@ -21,7 +21,7 @@ const RaveMap = () => {
 
     // TODO hier muss noch ein besseres Icon her
     const customMarkerIcon = icon({
-        iconUrl: "../../public/arrow.svg", 
+        iconUrl: "/arrow.svg", 
         iconSize: [32, 32]
     });
 

@@ -1,24 +1,35 @@
 # syntax=docker/dockerfile:1
+
+# Stage 1: Build the frontend
 FROM node:20-alpine AS build
 WORKDIR /app
 
-# install dependencies (use lockfile for reproducible builds)
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+# Install dependencies using npm (package-lock.json is the source of truth)
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# copy source and build using the project's build script
+# Copy source and build using the project's build script
 COPY . .
-RUN yarn build
+RUN npm run build
 
-FROM node:20-alpine AS runtime
-WORKDIR /app
+# Stage 2: PocketBase runtime with built frontend
+FROM alpine:latest
 
-# copy built assets
-COPY --from=build /app/dist ./dist
+RUN apk add --no-cache ca-certificates wget unzip
 
-# small static server (no nginx)
-ENV PORT=80
-RUN npm install -g serve@14 --no-audit --silent
+# Download PocketBase
+ARG POCKETBASE_VERSION=0.22.27
+RUN wget -O /tmp/pocketbase.zip "https://github.com/pocketbase/pocketbase/releases/download/v${POCKETBASE_VERSION}/pocketbase_${POCKETBASE_VERSION}_linux_amd64.zip" && \
+    unzip /tmp/pocketbase.zip -d /pb/ && \
+    chmod +x /pb/pocketbase && \
+    rm /tmp/pocketbase.zip
 
-EXPOSE 80
-CMD ["serve", "-s", "dist", "-l", "tcp://0.0.0.0:80"]
+# Copy built frontend to pb_public so PocketBase serves it automatically at /
+COPY --from=build /app/dist /pb/pb_public
+
+WORKDIR /pb
+
+EXPOSE 8090
+
+# Start PocketBase - serves static files from pb_public and the API from /api/
+CMD ["./pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data"]
