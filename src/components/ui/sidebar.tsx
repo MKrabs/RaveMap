@@ -10,7 +10,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, variant = 'sidebar',
   const base = 'flex flex-col text-sidebar-foreground';
   const variantClass =
     variant === 'floating'
-      ? 'fixed left-4 top-4 h-[calc(100vh-32px)] w-80 rounded-xl shadow-lg bg-white dark:bg-gray-800 z-40 overflow-hidden'
+      ? 'fixed left-4 top-4 h-[calc(100vh-32px)] w-80 rounded-xl shadow-lg bg-white dark:bg-gray-800 z-[999] overflow-hidden'
       : variant === 'inset'
       ? 'relative'
       : 'w-64';
