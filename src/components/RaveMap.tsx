@@ -1,4 +1,4 @@
-import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet'
+import { MapContainer, Marker, Popup, TileLayer, useMap, ZoomControl } from 'react-leaflet'
 import { useInfiniteList } from '../providers/InfiniteListContext';
 import { getUserLocation } from '../helpers/userLocation';
 import { useEffect, useState } from 'react';
@@ -51,10 +51,14 @@ const RaveMap = () => {
         <MapContainer center={center}
                       zoom={13}
                       scrollWheelZoom={true}
+                      zoomControl={false}
                       style={{ height: '100vh', width: '100vw' }}
         >
             {/* Update map view when userLocation changes */}
             <MapCenterUpdater center={center} />
+
+            {/* Move zoom controls to bottom-right to avoid sidebar overlap */}
+            <ZoomControl position="bottomright" />
             
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
