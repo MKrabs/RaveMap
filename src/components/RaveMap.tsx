@@ -82,7 +82,7 @@ const RaveMap = () => {
     }, []);
 
     const handleBoundsChange = useCallback((bbox: BBox) => {
-        reload(bbox);
+        reload({ bbox });
     }, [reload]);
 
     const customMarkerIcon = icon({

@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { ThemeToggle } from './ThemeToggle';
 import { useInfiniteList } from '../providers/InfiniteListContext';
 import type { EventItem } from '../providers/DataProvider';
+import { Input } from './ui/input';
 import {
   Sidebar,
   SidebarContent,
@@ -17,9 +18,10 @@ import {
 } from './ui/sidebar';
 
 const RaveList: React.FC = () => {
-  const { items, loadMore, hasMore, loading } = useInfiniteList();
+  const { items, loadMore, hasMore, loading, reload } = useInfiniteList();
   const { ref, inView } = useInView();
   const [openId, setOpenId] = React.useState<string | number | null>(null);
+  const [dateValue, setDateValue] = useState<string | null>(null);
 
   // Load more when sentinel comes into view
   useEffect(() => {
@@ -27,6 +29,12 @@ const RaveList: React.FC = () => {
   }, [inView, loadMore]);
 
   const toggle = (id: string | number) => setOpenId((p) => (p === id ? null : id));
+
+  const handleDateChange = (value: string) => {
+    const date = value || null;
+    setDateValue(date);
+    reload({ dateFilter: date });
+  };
 
   return (
     <Sidebar variant="floating">
@@ -37,6 +45,23 @@ const RaveList: React.FC = () => {
             <span className="text-xs text-muted-foreground">Live events</span>
           </div>
           <ThemeToggle />
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <Input
+            type="date"
+            value={dateValue ?? ''}
+            onChange={(e) => handleDateChange(e.target.value)}
+            className="h-8 text-xs"
+          />
+          {dateValue && (
+            <button
+              type="button"
+              className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer bg-transparent border-none p-0 shrink-0"
+              onClick={() => handleDateChange('')}
+            >
+              Clear
+            </button>
+          )}
         </div>
       </SidebarHeader>
 

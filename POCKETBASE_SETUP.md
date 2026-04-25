@@ -23,7 +23,7 @@ The `events` collection uses these fields:
 | Field       | Type   | Required | Notes                                      |
 |-------------|--------|----------|--------------------------------------------|
 | `name`        | Text   | Yes      | Event name shown in the sidebar list       |
-| `date`        | Text   | No       | Display date string, e.g. `2024-06-15`     |
+| `date`        | Date   | No       | Event date (ISO), e.g. `2024-06-15T00:00:00.000Z` |
 | `description` | Text   | No       | Description shown in list and map popup    |
 | `latitude`    | Number | Yes      | Map marker latitude                        |
 | `longitude`   | Number | Yes      | Map marker longitude                       |
@@ -67,7 +67,7 @@ Response:
       "created": "2024-01-01 00:00:00.000Z",
       "updated": "2024-01-01 00:00:00.000Z",
       "name": "Berlin Rave",
-      "date": "2024-06-15",
+      "date": "2024-06-15 00:00:00.000Z",
       "description": "Underground techno party",
       "latitude": 52.5200,
       "longitude": 13.4050

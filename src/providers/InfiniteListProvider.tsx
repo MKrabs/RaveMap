@@ -13,6 +13,7 @@ export const InfiniteListProvider: React.FC<React.PropsWithChildren<Record<strin
   // Ref guard to prevent concurrent requests (setState is async)
   const loadingRef = useRef(false);
   const currentBBox = useRef<BBox | undefined>(undefined);
+  const currentDateFilter = useRef<string | null>(null);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore) return;
@@ -21,7 +22,7 @@ export const InfiniteListProvider: React.FC<React.PropsWithChildren<Record<strin
     setLoading(true);
 
     try {
-      const data = await fetchItems(page, limit, currentBBox.current);
+      const data = await fetchItems(page, limit, currentBBox.current, currentDateFilter.current);
 
       // Append but avoid duplicates by id when possible
       setItems((prev) => {
@@ -44,18 +45,20 @@ export const InfiniteListProvider: React.FC<React.PropsWithChildren<Record<strin
     }
   }, [hasMore, page, limit]);
 
-  const reload = useCallback(async (bbox: BBox) => {
+  const reload = useCallback(async (opts?: { bbox?: BBox; dateFilter?: string | null }) => {
     if (loadingRef.current) return;
     loadingRef.current = true;
     setLoading(true);
 
-    currentBBox.current = bbox;
+    if (opts?.bbox !== undefined) currentBBox.current = opts.bbox;
+    if (opts?.dateFilter !== undefined) currentDateFilter.current = opts.dateFilter;
+
     setItems([]);
     setPage(1);
     setHasMore(true);
 
     try {
-      const data = await fetchItems(1, limit, currentBBox.current);
+      const data = await fetchItems(1, limit, currentBBox.current, currentDateFilter.current);
       const seen = new Set<string>();
       const filtered = data.filter((d) => {
         if (!d.id) return true;
