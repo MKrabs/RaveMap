@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { ThemeToggle } from './ThemeToggle';
 import { useInfiniteList } from '../providers/InfiniteListContext';
 import type { EventItem } from '../providers/DataProvider';
+import { Input } from './ui/input';
 import {
   Sidebar,
   SidebarContent,
@@ -17,22 +18,40 @@ import {
 } from './ui/sidebar';
 
 const RaveList: React.FC = () => {
-  const { items, loadMore, hasMore, loading } = useInfiniteList();
+  const { items, loadMore, hasMore, loading, reload } = useInfiniteList();
   const { ref, inView } = useInView();
   const [openId, setOpenId] = React.useState<string | number | null>(null);
+  const [dateValue, setDateValue] = useState<string | null>(null);
 
-  // Load initial items on mount
-  useEffect(() => {
-    if (items.length === 0) loadMore();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // When sentinel comes into view, load more
+  // Load more when sentinel comes into view
   useEffect(() => {
     if (inView) loadMore();
   }, [inView, loadMore]);
 
   const toggle = (id: string | number) => setOpenId((p) => (p === id ? null : id));
+
+  const handleDateChange = (value: string) => {
+    const date = value || null;
+    setDateValue(date);
+    reload({ dateFilter: date });
+  };
+
+  const formatGermanDate = (dateStr: string): string => {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const fmt = new Intl.DateTimeFormat('de-DE', {
+      timeZone: 'Europe/Berlin',
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const parts = fmt.formatToParts(d);
+    const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+    return `${get('day')}.${get('month')}.${get('year')} um ${get('hour')}:${get('minute')} Uhr`;
+  };
 
   return (
     <Sidebar variant="floating">
@@ -43,6 +62,23 @@ const RaveList: React.FC = () => {
             <span className="text-xs text-muted-foreground">Live events</span>
           </div>
           <ThemeToggle />
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <Input
+            type="date"
+            value={dateValue ?? ''}
+            onChange={(e) => handleDateChange(e.target.value)}
+            className="h-8 text-xs"
+          />
+          {dateValue && (
+            <button
+              type="button"
+              className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer bg-transparent border-none p-0 shrink-0"
+              onClick={() => handleDateChange('')}
+            >
+              Clear
+            </button>
+          )}
         </div>
       </SidebarHeader>
 
@@ -56,7 +92,7 @@ const RaveList: React.FC = () => {
                   <SidebarMenuButton onClick={() => toggle(event.id ?? idx)}>
                     <div className="flex-1">
                       <div className="font-medium">{event.name ?? 'Untitled event'}</div>
-                      <div className="text-xs text-muted-foreground">{event.date ?? ''}</div>
+                      <div className="text-xs text-muted-foreground">{event.date ? formatGermanDate(event.date) : ''}</div>
                     </div>
                     <div>{openId === (event.id ?? idx) ? '-' : '+'}</div>
                   </SidebarMenuButton>
