@@ -7,10 +7,10 @@ type SidebarProps = React.HTMLAttributes<HTMLElement> & {
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ children, variant = 'sidebar', side = 'left', className = '', ...props }) => {
-  const base = 'flex flex-col text-sidebar-foreground';
+  const base = 'flex flex-col bg-sidebar text-sidebar-foreground';
   const variantClass =
     variant === 'floating'
-      ? 'fixed left-4 top-4 h-[calc(100vh-32px)] w-80 rounded-xl shadow-lg bg-white dark:bg-gray-800 z-[999] overflow-hidden'
+      ? 'fixed left-4 top-4 h-[calc(100vh-32px)] w-80 rounded-xl shadow-lg bg-sidebar z-[999] overflow-hidden'
       : variant === 'inset'
       ? 'relative'
       : 'w-64';
@@ -25,7 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ children, variant = 'sidebar',
 };
 
 export const SidebarHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ children, className = '', ...props }) => (
-  <div className={`flex-shrink-0 px-4 py-3 border-b ${className}`} {...props}>
+  <div className={`flex-shrink-0 px-4 py-3 border-b border-sidebar-border ${className}`} {...props}>
     {children}
   </div>
 );
@@ -70,14 +70,14 @@ type SidebarMenuButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & { 
 export const SidebarMenuButton: React.FC<SidebarMenuButtonProps> = ({ children, isActive, className = '', ...props }) => (
   <button
     {...props}
-    className={`w-full text-left px-3 py-2 flex items-center justify-between gap-2 ${isActive ? 'bg-gray-100 dark:bg-gray-700' : 'hover:bg-gray-50 dark:hover:bg-gray-700'} ${className}`}
+    className={`w-full text-left px-3 py-2 flex items-center justify-between gap-2 ${isActive ? 'bg-sidebar-accent' : 'hover:bg-sidebar-accent'} ${className}`}
   >
     {children}
   </button>
 );
 
 export const SidebarRail: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({ className = '', ...props }) => (
-  <div className={`p-2 border-t ${className}`} {...props} />
+  <div className={`p-2 border-t border-sidebar-border ${className}`} {...props} />
 );
 
 export default Sidebar;

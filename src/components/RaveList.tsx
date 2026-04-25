@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { ThemeToggle } from './ThemeToggle';
 import { useInfiniteList } from '../providers/InfiniteListContext';
 import type { EventItem } from '../providers/DataProvider';
 import {
@@ -36,9 +37,12 @@ const RaveList: React.FC = () => {
   return (
     <Sidebar variant="floating">
       <SidebarHeader>
-        <div className="flex flex-col">
-          <span className="font-semibold">RaveMap</span>
-          <span className="text-xs text-muted-foreground">Live events</span>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="font-semibold">RaveMap</span>
+            <span className="text-xs text-muted-foreground">Live events</span>
+          </div>
+          <ThemeToggle />
         </div>
       </SidebarHeader>
 
@@ -58,7 +62,7 @@ const RaveList: React.FC = () => {
                   </SidebarMenuButton>
 
                   {openId === (event.id ?? idx) && (
-                    <div className="px-3 pb-3 text-sm text-gray-700 dark:text-gray-300">
+                    <div className="px-3 pb-3 text-sm text-muted-foreground">
                       {event.description ?? 'No description'}
                     </div>
                   )}
