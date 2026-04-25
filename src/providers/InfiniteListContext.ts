@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import type { EventItem } from './DataProvider';
+import type { EventItem, BBox } from './DataProvider';
 
 export interface InfiniteListContextType {
   items: EventItem[];
@@ -7,6 +7,7 @@ export interface InfiniteListContextType {
   loading: boolean;
   loadMore: () => void;
   resetList: () => void;
+  reload: (bbox: BBox) => void;
 }
 
 export const InfiniteListContext = createContext<InfiniteListContextType>({
@@ -15,6 +16,7 @@ export const InfiniteListContext = createContext<InfiniteListContextType>({
   loading: false,
   loadMore: () => {},
   resetList: () => {},
+  reload: () => {},
 });
 
 export const useInfiniteList = () => useContext(InfiniteListContext);

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { fetchItems } from './DataProvider';
-import type { EventItem } from './DataProvider';
+import type { EventItem, BBox } from './DataProvider';
 import { InfiniteListContext } from './InfiniteListContext';
 
 export const InfiniteListProvider: React.FC<React.PropsWithChildren<Record<string, unknown>>> = ({ children }) => {
@@ -12,6 +12,7 @@ export const InfiniteListProvider: React.FC<React.PropsWithChildren<Record<strin
 
   // Ref guard to prevent concurrent requests (setState is async)
   const loadingRef = useRef(false);
+  const currentBBox = useRef<BBox | undefined>(undefined);
 
   const loadMore = useCallback(async () => {
     if (loadingRef.current || !hasMore) return;
@@ -20,7 +21,7 @@ export const InfiniteListProvider: React.FC<React.PropsWithChildren<Record<strin
     setLoading(true);
 
     try {
-      const data = await fetchItems(page, limit);
+      const data = await fetchItems(page, limit, currentBBox.current);
 
       // Append but avoid duplicates by id when possible
       setItems((prev) => {
@@ -43,6 +44,37 @@ export const InfiniteListProvider: React.FC<React.PropsWithChildren<Record<strin
     }
   }, [hasMore, page, limit]);
 
+  const reload = useCallback(async (bbox: BBox) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setLoading(true);
+
+    currentBBox.current = bbox;
+    setItems([]);
+    setPage(1);
+    setHasMore(true);
+
+    try {
+      const data = await fetchItems(1, limit, currentBBox.current);
+      const seen = new Set<string>();
+      const filtered = data.filter((d) => {
+        if (!d.id) return true;
+        const id = String(d.id);
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
+      setItems(filtered);
+      setHasMore(data.length === limit);
+      setPage(2);
+    } catch (err) {
+      console.error('Error reloading items:', err);
+    } finally {
+      loadingRef.current = false;
+      setLoading(false);
+    }
+  }, [limit]);
+
   const resetList = () => {
     setItems([]);
     setPage(1);
@@ -51,7 +83,7 @@ export const InfiniteListProvider: React.FC<React.PropsWithChildren<Record<strin
 
   return (
     <InfiniteListContext.Provider
-      value={{ items, hasMore, loading, loadMore, resetList }}
+      value={{ items, hasMore, loading, loadMore, resetList, reload }}
     >
       {children}
     </InfiniteListContext.Provider>

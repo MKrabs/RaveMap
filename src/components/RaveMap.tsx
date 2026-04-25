@@ -2,25 +2,60 @@ import { MapContainer, Marker, Popup, TileLayer, useMap, ZoomControl } from 'rea
 import { useInfiniteList } from '../providers/InfiniteListContext';
 import { useTheme } from '../hooks/use-theme';
 import { getUserLocation } from '../helpers/userLocation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { icon } from 'leaflet';
 import { Toast } from './ui/toast';
+import type { BBox } from '../providers/DataProvider';
 
 // Default center (Berlin) if geolocation fails or is denied
 const DEFAULT_CENTER: [number, number] = [52.52, 13.4050];
+
+const MapBoundsTracker = ({ onBoundsChange }: { onBoundsChange: (bbox: BBox) => void }) => {
+    const map = useMap();
+    const timeoutRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        const handleMoveEnd = () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            timeoutRef.current = window.setTimeout(() => {
+                const b = map.getBounds();
+                onBoundsChange({
+                    north: b.getNorth(),
+                    south: b.getSouth(),
+                    east: b.getEast(),
+                    west: b.getWest(),
+                });
+            }, 300);
+        };
+
+        map.on('moveend', handleMoveEnd);
+        handleMoveEnd();
+
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            map.off('moveend', handleMoveEnd);
+        };
+    }, [map, onBoundsChange]);
+
+    return null;
+};
 
 // Component to update map center when location is obtained
 const MapCenterUpdater = ({ center }: { center: [number, number] }) => {
     const map = useMap();
     useEffect(() => {
-        // Only animate if we actually have a center to go to (not null)
-        map.setView(center, map.getZoom(), { animate: true });
+        const currentCenter = map.getCenter();
+        const [lat, lng] = center;
+        // Prevent setView when the map is already at this center to avoid triggering moveend → reload loops
+        if (currentCenter.lat !== lat || currentCenter.lng !== lng) {
+            map.setView(center, map.getZoom(), { animate: true });
+        }
     }, [center, map]);
     return null;
 };
 
 const RaveMap = () => {
-    const { items } = useInfiniteList();
+    const { items, reload } = useInfiniteList();
     const { resolvedTheme } = useTheme();
     const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
     const [geoError, setGeoError] = useState<string | null>(null);
@@ -46,6 +81,10 @@ const RaveMap = () => {
             });
     }, []);
 
+    const handleBoundsChange = useCallback((bbox: BBox) => {
+        reload(bbox);
+    }, [reload]);
+
     const customMarkerIcon = icon({
         iconUrl: "/arrow.svg",
         iconSize: [32, 32]
@@ -56,9 +95,12 @@ const RaveMap = () => {
         // highlight list item
     }
 
-    const center: [number, number] = userLocation
-        ? [userLocation.coords.latitude, userLocation.coords.longitude]
-        : DEFAULT_CENTER;
+    const center = useMemo<[number, number]>(() => {
+        if (userLocation) {
+            return [userLocation.coords.latitude, userLocation.coords.longitude];
+        }
+        return DEFAULT_CENTER;
+    }, [userLocation]);
 
     return (
         <>
@@ -78,6 +120,7 @@ const RaveMap = () => {
             >
                 {/* Update map view when userLocation changes */}
                 <MapCenterUpdater center={center} />
+                <MapBoundsTracker onBoundsChange={handleBoundsChange} />
 
                 {/* Move zoom controls to bottom-right to avoid sidebar overlap */}
                 <ZoomControl position="bottomright" />

@@ -21,13 +21,7 @@ const RaveList: React.FC = () => {
   const { ref, inView } = useInView();
   const [openId, setOpenId] = React.useState<string | number | null>(null);
 
-  // Load initial items on mount
-  useEffect(() => {
-    if (items.length === 0) loadMore();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // When sentinel comes into view, load more
+  // Load more when sentinel comes into view
   useEffect(() => {
     if (inView) loadMore();
   }, [inView, loadMore]);
