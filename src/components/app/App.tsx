@@ -1,9 +1,11 @@
 import './App.css'
 import RaveList from '../RaveList.tsx';
+import RaveMap from '../RaveMap.tsx';
 
 function App() {
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div className="relative w-full h-screen overflow-hidden bg-gray-100 dark:bg-gray-900">
+            <RaveMap />
             <RaveList />
         </div>
     )
