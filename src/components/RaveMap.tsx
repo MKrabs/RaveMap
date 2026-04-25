@@ -22,7 +22,6 @@ const RaveMap = () => {
     const { items } = useInfiniteList();
     const { resolvedTheme } = useTheme();
     const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
-    const [locationError, setLocationError] = useState<boolean>(false);
 
     useEffect(() => {
         getUserLocation()
@@ -31,7 +30,6 @@ const RaveMap = () => {
             })
             .catch(err => {
                 console.warn('Geolocation failed, using default center:', err);
-                setLocationError(true);
             });
     }, []);
 
@@ -62,7 +60,6 @@ const RaveMap = () => {
             {/* Move zoom controls to bottom-right to avoid sidebar overlap */}
             <ZoomControl position="bottomright" />
             
-            {/* The dark mode is a bit too dark for me. Look for a more contrasty one later */}
             <TileLayer
                 key={resolvedTheme}
                 attribution={
@@ -76,11 +73,6 @@ const RaveMap = () => {
                         : 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
                 }
             />
-            {locationError && (
-                <Marker position={DEFAULT_CENTER} icon={customMarkerIcon}>
-                    <Popup>Default location (geolocation unavailable)</Popup>
-                </Marker>
-            )}
             {items.map((marker, index) => (
                 <Marker key={index} position={[marker.latitude, marker.longitude]} icon={customMarkerIcon} eventHandlers={{ click: () => handleMarkerClick(index) }}>
                     <Popup>
