@@ -27,9 +27,12 @@ RUN wget -O /tmp/pocketbase.zip "https://github.com/pocketbase/pocketbase/releas
 # Copy built frontend to pb_public so PocketBase serves it automatically at /
 COPY --from=build /app/dist /pb/pb_public
 
+# Copy PocketBase JS hooks
+COPY pb_hooks/ /pb/pb_hooks/
+
 WORKDIR /pb
 
 EXPOSE 8090
 
 # Start PocketBase - serves static files from pb_public and the API from /api/
-CMD ["./pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data"]
+CMD ["./pocketbase", "serve", "--http=0.0.0.0:8090", "--dir=/pb/pb_data", "--hooksDir=/pb/pb_hooks"]

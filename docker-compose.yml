@@ -9,8 +9,9 @@ services:
       - "8090:8090"
     volumes:
       - pb_data:/pb/pb_data
+    env_file:
+      - .env
     environment:
-      # Optional: change this if you want a different exposed port inside the container
       - TZ=UTC
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:8090/api/collections/events/records?perPage=1"]
