@@ -6,7 +6,7 @@ import { InfiniteListContext } from './InfiniteListContext';
 export const InfiniteListProvider: React.FC<React.PropsWithChildren<Record<string, unknown>>> = ({ children }) => {
   const [items, setItems] = useState<EventItem[]>([]);
   const [page, setPage] = useState(1);
-  const [limit] = useState(1);
+  const [limit] = useState(50);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
 
