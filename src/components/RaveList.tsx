@@ -36,6 +36,23 @@ const RaveList: React.FC = () => {
     reload({ dateFilter: date });
   };
 
+  const formatGermanDate = (dateStr: string): string => {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const fmt = new Intl.DateTimeFormat('de-DE', {
+      timeZone: 'Europe/Berlin',
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const parts = fmt.formatToParts(d);
+    const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+    return `${get('day')}.${get('month')}.${get('year')} um ${get('hour')}:${get('minute')} Uhr`;
+  };
+
   return (
     <Sidebar variant="floating">
       <SidebarHeader>
@@ -75,7 +92,7 @@ const RaveList: React.FC = () => {
                   <SidebarMenuButton onClick={() => toggle(event.id ?? idx)}>
                     <div className="flex-1">
                       <div className="font-medium">{event.name ?? 'Untitled event'}</div>
-                      <div className="text-xs text-muted-foreground">{event.date ?? ''}</div>
+                      <div className="text-xs text-muted-foreground">{event.date ? formatGermanDate(event.date) : ''}</div>
                     </div>
                     <div>{openId === (event.id ?? idx) ? '-' : '+'}</div>
                   </SidebarMenuButton>
