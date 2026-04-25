@@ -1,5 +1,6 @@
 import { MapContainer, Marker, Popup, TileLayer, useMap, ZoomControl } from 'react-leaflet'
 import { useInfiniteList } from '../providers/InfiniteListContext';
+import { useTheme } from '../hooks/use-theme';
 import { getUserLocation } from '../helpers/userLocation';
 import { useEffect, useState } from 'react';
 import { icon } from 'leaflet';
@@ -19,6 +20,7 @@ const MapCenterUpdater = ({ center }: { center: [number, number] }) => {
 
 const RaveMap = () => {
     const { items } = useInfiniteList();
+    const { resolvedTheme } = useTheme();
     const [userLocation, setUserLocation] = useState<GeolocationPosition | null>(null);
     const [locationError, setLocationError] = useState<boolean>(false);
 
@@ -60,9 +62,19 @@ const RaveMap = () => {
             {/* Move zoom controls to bottom-right to avoid sidebar overlap */}
             <ZoomControl position="bottomright" />
             
+            {/* The dark mode is a bit too dark for me. Look for a more contrasty one later */}
             <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+                key={resolvedTheme}
+                attribution={
+                    resolvedTheme === 'dark'
+                        ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                        : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }
+                url={
+                    resolvedTheme === 'dark'
+                        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                        : 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
+                }
             />
             {locationError && (
                 <Marker position={DEFAULT_CENTER} icon={customMarkerIcon}>
