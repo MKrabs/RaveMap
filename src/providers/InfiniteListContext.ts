@@ -7,7 +7,7 @@ export interface InfiniteListContextType {
   loading: boolean;
   loadMore: () => void;
   resetList: () => void;
-  reload: (opts?: { bbox?: BBox; dateFilter?: string | null }) => void;
+  reload: (opts?: { bbox?: BBox; dateFrom?: string | null; dateTo?: string | null }) => void;
 }
 
 export const InfiniteListContext = createContext<InfiniteListContextType>({

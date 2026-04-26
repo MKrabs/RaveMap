@@ -4,6 +4,7 @@ import { ThemeToggle } from './ThemeToggle';
 import { useInfiniteList } from '../providers/InfiniteListContext';
 import type { EventItem } from '../providers/DataProvider';
 import { Input } from './ui/input';
+import { Button } from './ui/button';
 import {
   Sidebar,
   SidebarContent,
@@ -21,7 +22,8 @@ const RaveList: React.FC = () => {
   const { items, loadMore, hasMore, loading, reload } = useInfiniteList();
   const { ref, inView } = useInView();
   const [openId, setOpenId] = React.useState<string | number | null>(null);
-  const [dateValue, setDateValue] = useState<string | null>(null);
+  const [dateFrom, setDateFrom] = useState<string | null>(null);
+  const [dateTo, setDateTo] = useState<string | null>(null);
 
   // Load more when sentinel comes into view
   useEffect(() => {
@@ -30,10 +32,42 @@ const RaveList: React.FC = () => {
 
   const toggle = (id: string | number) => setOpenId((p) => (p === id ? null : id));
 
-  const handleDateChange = (value: string) => {
-    const date = value || null;
-    setDateValue(date);
-    reload({ dateFilter: date });
+  const toLocalISODate = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const handleDateChange = (from: string | null, to: string | null) => {
+    setDateFrom(from);
+    setDateTo(to);
+    reload({ dateFrom: from, dateTo: to });
+  };
+
+  const presets = {
+    today: () => {
+      const now = new Date();
+      handleDateChange(toLocalISODate(now), toLocalISODate(now));
+    },
+    thisWeek: () => {
+      const now = new Date();
+      const day = now.getDay(); // 0 = Sunday
+      const diffToSunday = day === 0 ? 0 : 7 - day;
+      const sunday = new Date(now);
+      sunday.setDate(now.getDate() + diffToSunday);
+      handleDateChange(toLocalISODate(now), toLocalISODate(sunday));
+    },
+    nextWeekend: () => {
+      const now = new Date();
+      const day = now.getDay(); // 0 = Sunday
+      const daysUntilSat = day === 6 ? 7 : (6 - day + 7) % 7 || 7;
+      const sat = new Date(now);
+      sat.setDate(now.getDate() + daysUntilSat);
+      const sun = new Date(sat);
+      sun.setDate(sat.getDate() + 1);
+      handleDateChange(toLocalISODate(sat), toLocalISODate(sun));
+    },
   };
 
   const formatGermanDate = (dateStr: string): string => {
@@ -63,22 +97,37 @@ const RaveList: React.FC = () => {
           </div>
           <ThemeToggle />
         </div>
-        <div className="mt-3 flex items-center gap-2">
-          <Input
-            type="date"
-            value={dateValue ?? ''}
-            onChange={(e) => handleDateChange(e.target.value)}
-            className="h-8 text-xs"
-          />
-          {dateValue && (
-            <button
-              type="button"
-              className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer bg-transparent border-none p-0 shrink-0"
-              onClick={() => handleDateChange('')}
-            >
-              Clear
-            </button>
-          )}
+        <div className="mt-3 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <Input
+              type="date"
+              value={dateFrom ?? ''}
+              onChange={(e) => handleDateChange(e.target.value || null, dateTo)}
+              className="h-8 text-xs"
+            />
+            <span className="text-xs text-muted-foreground">–</span>
+            <Input
+              type="date"
+              value={dateTo ?? ''}
+              min={dateFrom || undefined}
+              onChange={(e) => handleDateChange(dateFrom, e.target.value || null)}
+              className="h-8 text-xs"
+            />
+            {(dateFrom || dateTo) && (
+              <button
+                type="button"
+                className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer bg-transparent border-none p-0 shrink-0"
+                onClick={() => handleDateChange(null, null)}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={presets.today}>Today</Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={presets.thisWeek}>This Week</Button>
+            <Button variant="outline" size="sm" className="h-7 text-xs" onClick={presets.nextWeekend}>Next Weekend</Button>
+          </div>
         </div>
       </SidebarHeader>
 
